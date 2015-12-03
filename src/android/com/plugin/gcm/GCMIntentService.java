@@ -26,6 +26,7 @@ import com.google.android.gcm.GCMBaseIntentService;
 public class GCMIntentService extends GCMBaseIntentService {
 
 	private static final String TAG = "GCMIntentService";
+	public static final String COM_PLUGIN_PUSH = "com.plugin.gcm";
 
 	public GCMIntentService() {
 		super("GCMIntentService");
@@ -68,13 +69,27 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 		// Extract the payload from the message
 		Bundle extras = intent.getExtras();
+		//SharedPreferences prefs = getApplicationContext().getSharedPreferences(PushPlugin.getApplicationContext(), Context.MODE_PRIVATE);
+		//boolean forceShow = prefs.getBoolean("forceShow", false);
 		if (extras != null)
 		{
 			// if we are in the foreground, just surface the payload, else post it to the statusbar
-            if (PushPlugin.isInForeground()) {
+            //if (!forceShow && PushPlugin.isInForeground()) {
+			//	extras.putBoolean("foreground", true);
+            //    PushPlugin.sendExtras(extras);
+			//}
+			//else  if (forceShow && PushPlugin.isInForeground()) {
 				extras.putBoolean("foreground", true);
-                PushPlugin.sendExtras(extras);
-			}
+				// Send a notification if there is a message
+                if (extras.getString("message") != null && extras.getString("message").length() != 0) {
+		    if (extras.getString("bigPicture") != null) {
+			createBigPicNotification(context, extras);
+		    }
+		    else {
+			createNotification(context, extras);
+		    }
+                }
+			//}
 			else {
 				extras.putBoolean("foreground", false);
 
